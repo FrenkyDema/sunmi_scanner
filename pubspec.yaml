@@ -1,6 +1,6 @@
 name: sunmi_scanner
 description: A packae for support sunmi scanners
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/FrenkyDema/sunmi_scanner
 
 environment:
