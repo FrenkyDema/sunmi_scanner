@@ -1,3 +1,7 @@
+## 0.0.3
+
+Update pubspec
+
 ## 0.0.2
 
 Update minSdkVersion -> 16
