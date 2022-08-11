@@ -10,9 +10,11 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.view.KeyEvent;
 import android.widget.Toast;
-
 import com.sunmi.scanner.IScanInterface;
 
+/**
+ * The type Sunmi scanner method.
+ */
 public class SunmiScannerMethod {
     private static final String SERVICE＿PACKAGE = "com.sunmi.scanner";
     private static final String SERVICE＿ACTION = "com.sunmi.scanner.IScanInterface";
@@ -21,6 +23,11 @@ public class SunmiScannerMethod {
     private final Context _context;
 
 
+    /**
+     * Instantiates a new Sunmi scanner method.
+     *
+     * @param _context the context
+     */
     public SunmiScannerMethod(Context _context) {
         this._context = _context;
         connService = new ServiceConnection() {
@@ -72,6 +79,9 @@ public class SunmiScannerMethod {
     }
 
 
+    /**
+     * Connect scanner service.
+     */
     public void connectScannerService() {
         Intent intent = new Intent();
         intent.setPackage(SERVICE＿PACKAGE);
@@ -79,6 +89,9 @@ public class SunmiScannerMethod {
         _context.getApplicationContext().bindService(intent, connService, Service.BIND_AUTO_CREATE);
     }
 
+    /**
+     * Disconnect scanner service.
+     */
     public void disconnectScannerService() {
         if (scannerService != null) {
             _context.getApplicationContext().unbindService(connService);
@@ -87,6 +100,11 @@ public class SunmiScannerMethod {
     }
 
 
+    /**
+     * Send key event.
+     *
+     * @param key the key
+     */
     public void sendKeyEvent(KeyEvent key) {
         if (scannerService == null) return;
         try {
@@ -97,6 +115,9 @@ public class SunmiScannerMethod {
     }
 
 
+    /**
+     * Start scan.
+     */
     public void scan() {
         if (scannerService == null) return;
         try {
@@ -106,6 +127,9 @@ public class SunmiScannerMethod {
         }
     }
 
+    /**
+     * Stop scan.
+     */
     public void stop() {
         if (scannerService == null) return;
         try {
@@ -115,6 +139,11 @@ public class SunmiScannerMethod {
         }
     }
 
+    /**
+     * Gets scanner model.
+     *
+     * @return the scanner model
+     */
     public int getScannerModel() {
         if (scannerService == null) return 0;
         try {

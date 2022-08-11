@@ -49,10 +49,10 @@ class SunmiScanner {
   /// Calls `getScannerModel` and returns true if it's greater than 100
   static Future<bool> isScannerAvailable() async {
     var model = (await _channel.invokeMethod('GET_MODEL')).toInt();
-    print(model);
     return (model > 100);
   }
 
+  /// Stream for the event value
   static Stream<String>? _onBarcodeScanned;
 
   /// Subscribe to this stream to receive barcode as string when it's scanned.

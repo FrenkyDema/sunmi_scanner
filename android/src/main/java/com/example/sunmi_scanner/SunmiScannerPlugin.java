@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 import android.view.KeyEvent;
-
 import androidx.annotation.NonNull;
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.EventChannel.EventSink;
@@ -19,8 +17,9 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
+
 /**
- * SunmiScanner
+ * The type Sunmi scanner plugin.
  */
 public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, StreamHandler {
     private BroadcastReceiver scannerServiceReceiver;
@@ -29,6 +28,11 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
     private EventChannel eventChannel;
     private Context context;
 
+    /**
+     * On attached to engine.
+     *
+     * @param flutterPluginBinding the flutter plugin binding
+     */
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         context = flutterPluginBinding.getApplicationContext();
@@ -40,10 +44,14 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
 
         methodChannel.setMethodCallHandler(this);
         sunmiScannerMethod.connectScannerService();
-
-
     }
 
+    /**
+     * On method call.
+     *
+     * @param call   the call
+     * @param result the result
+     */
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         Log.wtf("Method:", call.method);
@@ -79,6 +87,12 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
     }
 
 
+    /**
+     * On listen.
+     *
+     * @param arguments the arguments
+     * @param events    the events
+     */
     @Override
     public void onListen(Object arguments, EventSink events) {
         scannerServiceReceiver = createScannerServiceReceiver(events);
@@ -86,6 +100,11 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
                 scannerServiceReceiver, new IntentFilter("com.sunmi.scanner.ACTION_DATA_CODE_RECEIVED"));
     }
 
+    /**
+     * On cancel.
+     *
+     * @param arguments the arguments
+     */
     @Override
     public void onCancel(Object arguments) {
         if (scannerServiceReceiver != null) {
@@ -98,6 +117,12 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
         }
     }
 
+    /**
+     * Create scanner service receiver from event sink.
+     *
+     * @param events the event sink
+     * @return BroadcastReceiver
+     */
     private BroadcastReceiver createScannerServiceReceiver(final EventSink events) {
         return new BroadcastReceiver() {
             @Override
@@ -108,6 +133,11 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
         };
     }
 
+    /**
+     * On detached from engine.
+     *
+     * @param binding the binding
+     */
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         onCancel(null);
