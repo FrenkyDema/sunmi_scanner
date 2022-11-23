@@ -116,7 +116,7 @@ public class SunmiScannerMethod {
 
 
     /**
-     * Start scan.
+     * Scan.
      */
     public void scan() {
         if (scannerService == null) return;
@@ -128,7 +128,7 @@ public class SunmiScannerMethod {
     }
 
     /**
-     * Stop scan.
+     * Stop.
      */
     public void stop() {
         if (scannerService == null) return;

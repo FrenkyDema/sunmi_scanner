@@ -1,3 +1,9 @@
+# CHANGELOG
+
+## 0.0.4
+
+Documentation & Refactoring
+
 ## 0.0.3
 
 Update pubspec

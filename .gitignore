@@ -136,3 +136,7 @@ fabric.properties
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/androidstudio
+.dart_tool/package_config.json
+.dart_tool/package_config.json
+.dart_tool/package_config.json
+.dart_tool/package_config_subset

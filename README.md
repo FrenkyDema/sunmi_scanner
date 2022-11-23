@@ -8,6 +8,30 @@ A packae for support sunmi scanners
 
 ---
 
+## Class Name
+
+```dart
+SunmiScanner
+```
+
+## Example
+
+```dart
+void _setScannedValue(String value) {
+    setState(() {
+      scannedValue = value;
+    });
+  }
+
+@override
+  void initState() {
+    super.initState();
+    SunmiScanner.onBarcodeScanned().listen((event) {
+      _setScannedValue(event);
+    });
+  }
+```
+
 ## Installation
 
 ```bash
