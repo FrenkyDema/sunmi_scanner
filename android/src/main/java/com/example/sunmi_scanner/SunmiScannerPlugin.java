@@ -1,13 +1,16 @@
 package com.example.sunmi_scanner;
 
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 import android.view.KeyEvent;
+
 import androidx.annotation.NonNull;
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.EventChannel.EventSink;
@@ -93,11 +96,14 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
      * @param arguments the arguments
      * @param events    the events
      */
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     public void onListen(Object arguments, EventSink events) {
         scannerServiceReceiver = createScannerServiceReceiver(events);
         context.registerReceiver(
-                scannerServiceReceiver, new IntentFilter("com.sunmi.scanner.ACTION_DATA_CODE_RECEIVED"));
+                scannerServiceReceiver,
+                new IntentFilter("com.sunmi.scanner.ACTION_DATA_CODE_RECEIVED")
+        );
     }
 
     /**
