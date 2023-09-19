@@ -36,13 +36,15 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Text(scannedValue ?? ""),
-            ),
-          ],
+        body: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Text(scannedValue ?? ""),
+              ),
+            ],
+          ),
         ),
       ),
     );
