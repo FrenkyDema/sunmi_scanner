@@ -26,8 +26,8 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    compileSdk flutter.compileSdkVersion
+    ndkVersion "26.1.10909125"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -52,6 +52,7 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    namespace 'com.example.sunmi_scanner_example'
 }
 
 flutter {
