@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.5
+
+Documentation & Dependencies update
+
 ## 0.0.4
 
 Documentation & Refactoring
