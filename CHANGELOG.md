@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.6
+
+Update github repo
+
 ## 0.0.5
 
 Documentation & Dependencies update

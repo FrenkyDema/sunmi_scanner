@@ -1,6 +1,6 @@
 name: sunmi_scanner
 description: "Sunmi support package that allows you to easily interface with your scanner device"
-version: 0.0.5
+version: 0.0.6
 repository: "https://github.com/FrenkyDema/sunmi_scanner"
 
 environment:
