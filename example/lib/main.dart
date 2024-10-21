@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Center(
-                child: Text(scannedValue ?? ""),
+                child: Text("scanning: ${scannedValue ?? ""}"),
               ),
             ],
           ),
