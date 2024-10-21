@@ -1,0 +1,20 @@
+documentation:
+  - .github/*
+  - CHANGELOG.md
+  - LICENSE
+  - README.md
+
+test:
+  - test/*
+
+example:
+  - example/*
+
+android:
+  - android/*
+
+workflows:
+  - .github/workflows/*
+
+lib:
+  - lib/*
