@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.7
+
+Update project dependencies
+
 ## 0.0.6
 
 Update github repo

@@ -1,6 +1,6 @@
-# sunmi_scanner_example
+# sunm_scanner_example
 
-Demonstrates how to use the sunmi_scanner plugin.
+Demonstrates how to use the sunm_scanner plugin.
 
 ## Getting Started
 

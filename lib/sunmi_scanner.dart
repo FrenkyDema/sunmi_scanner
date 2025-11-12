@@ -8,19 +8,22 @@ enum KeyAction {
   actionDown,
 
   /// Simulates button up on keyboard
-  actionUp
+  actionUp,
 }
 
 /// Plugin that wraps Sunmi Android SDK for integrated barcode scanner
 class SunmiScanner {
   static const MethodChannel _channel = MethodChannel('sunmi_scanner');
-  static const EventChannel _eventChannel =
-      EventChannel('sunmi_scanner_events');
+  static const EventChannel _eventChannel = EventChannel(
+    'sunmi_scanner_events',
+  );
 
   /// Customize the trigger key
   static void sendKeyEvent(KeyAction keyAction, int keyCode) async {
-    await _channel.invokeMethod(
-        'SEND_KEY_EVENT', {"key": keyAction.index, "code": keyCode});
+    await _channel.invokeMethod('SEND_KEY_EVENT', {
+      "key": keyAction.index,
+      "code": keyCode,
+    });
   }
 
   /// Start scanning
@@ -58,9 +61,9 @@ class SunmiScanner {
   /// Subscribe to this stream to receive barcode as string when it's scanned.
   /// Make sure to cancel subscription when you're done.
   static Stream<String> onBarcodeScanned() {
-    _onBarcodeScanned ??= _eventChannel
-        .receiveBroadcastStream()
-        .map((dynamic event) => event as String);
+    _onBarcodeScanned ??= _eventChannel.receiveBroadcastStream().map(
+      (dynamic event) => event as String,
+    );
     return _onBarcodeScanned ?? const Stream<String>.empty();
   }
 }
