@@ -1,4 +1,4 @@
-package dev.francescodema.sunm_scanner_example;
+package dev.francescodema.sunmi_scanner_example;
 
 import io.flutter.embedding.android.FlutterActivity;
 
