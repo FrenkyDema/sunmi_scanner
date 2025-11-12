@@ -3,7 +3,7 @@ import UIKit
 import XCTest
 
 
-@testable import sunm_scanner
+@testable import sunmi_scanner
 
 // This demonstrates a simple unit test of the Swift portion of this plugin's implementation.
 //
