@@ -14,43 +14,43 @@ enum KeyAction {
 /// Represents the specific hardware model of the Sunmi scanner.
 enum SunmiScannerModel {
   /// No scanner hardware found.
-  NONE,
+  none,
 
   /// P2Lite, V2Pro, or P2Pro
-  P2LITE_V2PRO_P2PRO,
+  p2LiteV2ProP2Pro,
 
   /// L2 with Newland scanner
-  L2_NEWLAND,
+  l2Newland,
 
   /// L2 with Zebra scanner (SE4710)
-  L2_ZEBRA_SE4710,
+  l2ZebraSe4710,
 
   /// L2 with HoneyWell scanner (N3601)
-  L2_HONEYWELL_N3601,
+  l2HoneywellN3601,
 
   /// L2 with HoneyWell scanner (N6603)
-  L2_HONEYWELL_N6603,
+  l2HoneywellN6603,
 
   /// L2 with Zebra scanner (SE4750)
-  L2_ZEBRA_SE4750,
+  l2ZebraSe4750,
 
   /// L2 with Zebra scanner (EM1350)
-  L2_ZEBRA_EM1350,
+  l2ZebraEm1350,
 
   /// An unknown or unsupported scanner model.
-  UNKNOWN,
+  unknown,
 }
 
 /// Represents the connection status to the native Sunmi scanner service.
 enum ScannerConnectionStatus {
   /// Successfully connected to the service.
-  CONNECTED,
+  connected,
 
   /// Disconnected from the service (e.g., service crashed or was unbound).
-  DISCONNECTED,
+  disconnected,
 
   /// Failed to connect to the service.
-  FAILED_TO_CONNECT,
+  failedToConnect,
 }
 
 /// Plugin that wraps Sunmi Android SDK for integrated barcode scanner
@@ -130,23 +130,23 @@ class SunmiScanner {
     final int modelCode = await getScannerModel();
     switch (modelCode) {
       case 100:
-        return SunmiScannerModel.NONE;
+        return SunmiScannerModel.none;
       case 101:
-        return SunmiScannerModel.P2LITE_V2PRO_P2PRO;
+        return SunmiScannerModel.p2LiteV2ProP2Pro;
       case 102:
-        return SunmiScannerModel.L2_NEWLAND;
+        return SunmiScannerModel.l2Newland;
       case 103:
-        return SunmiScannerModel.L2_ZEBRA_SE4710;
+        return SunmiScannerModel.l2ZebraSe4710;
       case 104:
-        return SunmiScannerModel.L2_HONEYWELL_N3601;
+        return SunmiScannerModel.l2HoneywellN3601;
       case 105:
-        return SunmiScannerModel.L2_HONEYWELL_N6603;
+        return SunmiScannerModel.l2HoneywellN6603;
       case 106:
-        return SunmiScannerModel.L2_ZEBRA_SE4750;
+        return SunmiScannerModel.l2ZebraSe4750;
       case 107:
-        return SunmiScannerModel.L2_ZEBRA_EM1350;
+        return SunmiScannerModel.l2ZebraEm1350;
       default:
-        return SunmiScannerModel.UNKNOWN;
+        return SunmiScannerModel.unknown;
     }
   }
 
@@ -182,14 +182,14 @@ class SunmiScanner {
         .map((dynamic event) {
           switch (event as String) {
             case "CONNECTED":
-              return ScannerConnectionStatus.CONNECTED;
+              return ScannerConnectionStatus.connected;
             case "DISCONNECTED":
-              return ScannerConnectionStatus.DISCONNECTED;
+              return ScannerConnectionStatus.disconnected;
             case "FAILED_TO_CONNECT":
-              return ScannerConnectionStatus.FAILED_TO_CONNECT;
+              return ScannerConnectionStatus.failedToConnect;
             default:
               // This should not happen
-              return ScannerConnectionStatus.DISCONNECTED;
+              return ScannerConnectionStatus.disconnected;
           }
         });
     return _onScannerStatusChanged ??
