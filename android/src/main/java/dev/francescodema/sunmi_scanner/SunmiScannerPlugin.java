@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -26,9 +27,12 @@ import io.flutter.plugin.common.MethodChannel.Result;
  */
 public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, StreamHandler {
     private BroadcastReceiver scannerServiceReceiver;
-    private static SunmiScannerMethod sunmiScannerMethod;
+    private SunmiScannerMethod sunmiScannerMethod;
     private MethodChannel methodChannel;
     private EventChannel eventChannel;
+
+    private EventChannel connectionEventChannel;
+    private EventChannel.EventSink connectionEventSink;
     private Context context;
 
     /**
@@ -41,12 +45,28 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
         context = flutterPluginBinding.getApplicationContext();
         methodChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "sunmi_scanner");
         eventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "sunmi_scanner_events");
+        connectionEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "sunmi_scanner_connection_events");
+
         eventChannel.setStreamHandler(this);
-
-        sunmiScannerMethod = new SunmiScannerMethod(context);
-
         methodChannel.setMethodCallHandler(this);
-        sunmiScannerMethod.connectScannerService();
+
+        connectionEventChannel.setStreamHandler(new StreamHandler() {
+            @Override
+            public void onListen(Object arguments, EventSink events) {
+                connectionEventSink = events;
+                if (sunmiScannerMethod != null) {
+                    sunmiScannerMethod.setConnectionEventSink(connectionEventSink);
+                }
+            }
+
+            @Override
+            public void onCancel(Object arguments) {
+                connectionEventSink = null;
+                if (sunmiScannerMethod != null) {
+                    sunmiScannerMethod.setConnectionEventSink(null);
+                }
+            }
+        });
     }
 
     /**
@@ -58,34 +78,66 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         Log.wtf("Method:", call.method);
-        switch (call.method) {
-            case "SCAN":
-                sunmiScannerMethod.scan();
-                result.success(null);
-                break;
 
-            case "STOP":
-                sunmiScannerMethod.stop();
-                result.success(null);
-                break;
-
-            case "GET_MODEL":
-                int model = sunmiScannerMethod.getScannerModel();
-                result.success(model);
-                break;
-
-            case "SEND_KEY_EVENT":
-                int action = call.argument("key");
-                int code = call.argument("code");
-                sunmiScannerMethod.sendKeyEvent(new KeyEvent(action, code));
-                result.success(null);
-                break;
-
-            default: {
-                result.notImplemented();
-                break;
+        if (call.method.equals("bindService")) {
+            Boolean showToastArg = call.argument("showToast");
+            boolean showToast = (showToastArg != null) ? showToastArg : true;
+            if (sunmiScannerMethod == null) {
+                sunmiScannerMethod = new SunmiScannerMethod(context, showToast);
+                if (connectionEventSink != null) {
+                    sunmiScannerMethod.setConnectionEventSink(connectionEventSink);
+                }
             }
+            sunmiScannerMethod.connectScannerService();
+            result.success(null);
+            return;
+        }
 
+        if (call.method.equals("unbindService")) {
+            if (sunmiScannerMethod != null) {
+                sunmiScannerMethod.disconnectScannerService();
+                sunmiScannerMethod = null;
+            }
+            result.success(null);
+            return;
+        }
+
+        if (sunmiScannerMethod == null) {
+            result.error("NOT_BOUND", "Scanner service is not bound. Call bindService() first.", null);
+            return;
+        }
+
+        try {
+            switch (call.method) {
+                case "SCAN":
+                    sunmiScannerMethod.scan();
+                    result.success(null);
+                    break;
+
+                case "STOP":
+                    sunmiScannerMethod.stop();
+                    result.success(null);
+                    break;
+
+                case "GET_MODEL":
+                    int model = sunmiScannerMethod.getScannerModel();
+                    result.success(model);
+                    break;
+
+                case "SEND_KEY_EVENT":
+                    int action = call.argument("key");
+                    int code = call.argument("code");
+                    sunmiScannerMethod.sendKeyEvent(new KeyEvent(action, code));
+                    result.success(null);
+                    break;
+
+                default: {
+                    result.notImplemented();
+                    break;
+                }
+            }
+        } catch (RemoteException e) {
+            result.error("SERVICE_ERROR", "A remote exception occurred: " + e.getMessage(), e.toString());
         }
     }
 
@@ -148,11 +200,16 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         onCancel(null);
-        sunmiScannerMethod.disconnectScannerService();
+        if (sunmiScannerMethod != null) {
+            sunmiScannerMethod.disconnectScannerService();
+            sunmiScannerMethod = null;
+        }
         context = null;
         methodChannel.setMethodCallHandler(null);
         methodChannel = null;
         eventChannel.setStreamHandler(null);
         eventChannel = null;
+        connectionEventChannel.setStreamHandler(null);
+        connectionEventChannel = null;
     }
 }
