@@ -1,11 +1,10 @@
 name: sunmi_scanner
 description: "Sunmi support package that allows you to easily interface with your scanner device"
-version: 0.0.6
+version: 0.0.7
 repository: "https://github.com/FrenkyDema/sunmi_scanner"
 
 environment:
-  sdk: ">=2.18.0 <4.0.0"
-  flutter: ">=2.5.0"
+  sdk: '>=3.9.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -15,11 +14,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ">=5.0.0 <7.0.0"
+
+  flutter_lints: ^6.0.0
 
 flutter:
   plugin:
     platforms:
       android:
-        package: com.example.sunmi_scanner
+        package: dev.francescodema.sunmi_scanner
         pluginClass: SunmiScannerPlugin
