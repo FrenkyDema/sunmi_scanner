@@ -18,6 +18,12 @@ A Flutter plugin that wraps the Sunmi Android SDK for the integrated barcode sca
   error occurs.
 * **Scanner Control:** Programmatically start (`scan()`) and stop (`stop()`) the scanner.
 
+## Installation
+
+```bash
+flutter pub add sunmi_scanner
+```
+
 ## Usage
 
 ### 1. Bind the Service
@@ -149,6 +155,7 @@ class _MyAppState extends State<MyApp> {
 ```
 
 ## Tested Devices
+
 ```
 Sunmi L2ks
 SunMi P3H
