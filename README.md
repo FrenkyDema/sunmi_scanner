@@ -11,18 +11,22 @@ A Flutter plugin that wraps the Sunmi Android SDK for the integrated barcode sca
 * **Manual Service Control:** Manually bind and unbind from the Sunmi scanner service.
 * **Optional Toasts:** Disable the native "Service connected/disconnected" toasts.
 * **Barcode Events:** Listen to a stream of barcode scan events.
-* **Connection Status:** Listen to a stream of service connection status changes (`connected`, `disconnected`, `failedToConnect`).
+* **Connection Status:** Listen to a stream of service connection status changes (`connected`,
+  `disconnected`, `failedToConnect`).
 * **Type-Safe Models:** Get the hardware scanner model as a `SunmiScannerModel` enum.
-* **Error Handling:** Methods throw a `PlatformException` if the service is not bound or another error occurs.
+* **Error Handling:** Methods throw a `PlatformException` if the service is not bound or another
+  error occurs.
 * **Scanner Control:** Programmatically start (`scan()`) and stop (`stop()`) the scanner.
 
 ## Usage
 
 ### 1. Bind the Service
 
-You **must** call `SunmiScanner.bindService()` before using any other method. A good place to do this is in your `initState`.
+You **must** call `SunmiScanner.bindService()` before using any other method. A good place to do
+this is in your `initState`.
 
-You must also call `SunmiScanner.unbindService()` in your `dispose` method to clean up the connection.
+You must also call `SunmiScanner.unbindService()` in your `dispose` method to clean up the
+connection.
 
 ### 2. Listen to Streams and Call Methods
 
@@ -118,11 +122,17 @@ class _MyAppState extends State<MyApp> {
               SizedBox(height: 20),
               Text(
                 'Scanned Value:',
-                style: Theme.of(context).textTheme.titleLarge,
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .titleLarge,
               ),
               Text(
                 _scannedValue,
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .headlineMedium,
               ),
               SizedBox(height: 30),
               ElevatedButton(
@@ -136,3 +146,11 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+```
+
+## Tested Devices
+```
+Sunmi L2ks
+SunMi P3H
+SUNMI L2s PRO
+```
