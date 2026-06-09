@@ -152,10 +152,14 @@ class SunmiScanner {
 
   /// Calls `getScannerModel` and returns true if it's greater than 100.
   ///
-  /// Can throw a [PlatformException] if the service is not bound.
+  /// Returns false if the scanner service is unavailable or not bound.
   static Future<bool> isScannerAvailable() async {
-    var model = await getScannerModel();
-    return (model > 100);
+    try {
+      var model = await getScannerModel();
+      return (model > 100);
+    } on PlatformException {
+      return false;
+    }
   }
 
   /// Stream for the event value

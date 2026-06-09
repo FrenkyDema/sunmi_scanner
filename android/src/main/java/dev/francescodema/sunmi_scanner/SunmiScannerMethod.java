@@ -100,6 +100,11 @@ public class SunmiScannerMethod {
         Intent intent = new Intent();
         intent.setPackage(SERVICE_PACKAGE);
         intent.setAction(SERVICE_ACTION);
+        try {
+            _context.getApplicationContext().startService(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         _context.getApplicationContext().bindService(intent, connService, Service.BIND_AUTO_CREATE);
     }
 
