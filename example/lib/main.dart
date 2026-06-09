@@ -24,26 +24,37 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
+    SunmiScanner.onScannerStatusChanged().listen((status) {
+      switch (status) {
+        case ScannerConnectionStatus.connected:
+          debugPrint("Connected");
+          break;
+        case ScannerConnectionStatus.disconnected:
+          debugPrint("Disconnected");
+          break;
+        case ScannerConnectionStatus.failedToConnect:
+          debugPrint("Failed To Connect");
+          break;
+      }
+    });
+
     SunmiScanner.onBarcodeScanned().listen((event) {
       _setScannedValue(event);
     });
+
+    SunmiScanner.bindService();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
+        appBar: AppBar(title: const Text('Plugin example app')),
         body: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Text("scanning: ${scannedValue ?? ""}"),
-              ),
-            ],
+            children: [Center(child: Text("scanning: ${scannedValue ?? ""}"))],
           ),
         ),
       ),
