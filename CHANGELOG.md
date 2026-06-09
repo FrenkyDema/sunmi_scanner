@@ -1,15 +1,5 @@
 # CHANGELOG
 
-## 0.0.8
-
-* Make `isScannerAvailable()` return false when the platform channel throws, instead of propagating
-  the exception.
-* Adjust Android scanner integration (receiver export flag; attempt to start the scanner service
-  before binding).
-* Bump example lockfile SDK/dependency versions and update GitHub Actions workflow action versions.
-* Updated some Gradle config by the flutter migrator.
-* Better logs
-
 ## 0.0.7
 
 * **BREAKING CHANGE:** You must now call `SunmiScanner.bindService()` before using any scanner
@@ -24,6 +14,13 @@
   status (`ScannerConnectionStatus`).
 * Added `SunmiScannerModel` enum and `SunmiScanner.getScannerModelEnum()` method for type-safe model
   identification.
+* Make `isScannerAvailable()` return false when the platform channel throws, instead of propagating
+    the exception.
+* Adjust Android scanner integration (receiver export flag; attempt to start the scanner service
+  before binding).
+* Bump example lockfile SDK/dependency versions and update GitHub Actions workflow action versions.
+* Updated some Gradle config by the flutter migrator.
+* Better logs
 
 ## 0.0.6
 
