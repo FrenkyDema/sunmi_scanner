@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -18,14 +19,15 @@ import io.flutter.plugin.common.EventChannel;
  * The type Sunmi scanner method.
  */
 public class SunmiScannerMethod {
+    private static final String TAG = "SunmiScannerMethod";
     private static final String SERVICE_PACKAGE = "com.sunmi.scanner";
     private static final String SERVICE_ACTION = "com.sunmi.scanner.IScanInterface";
+
     private IScanInterface scannerService;
     private final ServiceConnection connService;
     private final Context _context;
     private final boolean _showToast;
     private EventChannel.EventSink connectionEventSink;
-
 
     /**
      * Instantiates a new Sunmi scanner method.
@@ -92,7 +94,6 @@ public class SunmiScannerMethod {
         this.connectionEventSink = sink;
     }
 
-
     /**
      * Connect scanner service.
      */
@@ -103,7 +104,7 @@ public class SunmiScannerMethod {
         try {
             _context.getApplicationContext().startService(intent);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to start scanner service", e);
         }
         _context.getApplicationContext().bindService(intent, connService, Service.BIND_AUTO_CREATE);
     }
@@ -113,11 +114,14 @@ public class SunmiScannerMethod {
      */
     public void disconnectScannerService() {
         if (scannerService != null) {
-            _context.getApplicationContext().unbindService(connService);
+            try {
+                _context.getApplicationContext().unbindService(connService);
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to unbind scanner service", e);
+            }
             scannerService = null;
         }
     }
-
 
     /**
      * Send key event.
@@ -132,11 +136,10 @@ public class SunmiScannerMethod {
         try {
             scannerService.sendKeyEvent(key);
         } catch (RemoteException e) {
-            e.printStackTrace();
+            Log.e(TAG, "RemoteException while sending key event", e);
             throw e;
         }
     }
-
 
     /**
      * Scan.
@@ -150,7 +153,7 @@ public class SunmiScannerMethod {
         try {
             scannerService.scan();
         } catch (RemoteException e) {
-            e.printStackTrace();
+            Log.e(TAG, "RemoteException while calling scan()", e);
             throw e;
         }
     }
@@ -167,7 +170,7 @@ public class SunmiScannerMethod {
         try {
             scannerService.stop();
         } catch (RemoteException e) {
-            e.printStackTrace();
+            Log.e(TAG, "RemoteException while calling stop()", e);
             throw e;
         }
     }
@@ -185,7 +188,7 @@ public class SunmiScannerMethod {
         try {
             return scannerService.getScannerModel();
         } catch (RemoteException e) {
-            e.printStackTrace();
+            Log.e(TAG, "RemoteException while getting scanner model", e);
             throw e;
         }
     }

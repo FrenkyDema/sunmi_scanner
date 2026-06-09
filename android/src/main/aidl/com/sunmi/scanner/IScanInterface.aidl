@@ -3,7 +3,7 @@ package com.sunmi.scanner;
 interface IScanInterface {
     /**
      * key.getAction()==KeyEvent.ACTION_UP
-     * key.getAction()==KeyEvent.ACTION_DWON
+     * key.getAction()==KeyEvent.ACTION_DOWN
      */
     void sendKeyEvent(in KeyEvent key);
     /**

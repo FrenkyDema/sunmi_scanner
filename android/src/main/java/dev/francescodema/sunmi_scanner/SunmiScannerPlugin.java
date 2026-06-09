@@ -1,7 +1,5 @@
 package dev.francescodema.sunmi_scanner;
 
-
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +9,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
@@ -21,11 +20,12 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-
 /**
  * The type Sunmi scanner plugin.
  */
 public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, StreamHandler {
+    private static final String TAG = "SunmiScannerPlugin";
+
     private BroadcastReceiver scannerServiceReceiver;
     private SunmiScannerMethod sunmiScannerMethod;
     private MethodChannel methodChannel;
@@ -77,7 +77,7 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
      */
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-        Log.wtf("Method:", call.method);
+        Log.d(TAG, "Method called: " + call.method);
 
         if (call.method.equals("bindService")) {
             Boolean showToastArg = call.argument("showToast");
@@ -125,8 +125,15 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
                     break;
 
                 case "SEND_KEY_EVENT":
-                    int action = call.argument("key");
-                    int code = call.argument("code");
+                    Integer action = call.argument("key");
+                    Integer code = call.argument("code");
+
+                    // Prevent NullPointerException by checking for null before unboxing
+                    if (action == null || code == null) {
+                        result.error("INVALID_ARGUMENT", "Arguments 'key' and 'code' must not be null.", null);
+                        return;
+                    }
+
                     sunmiScannerMethod.sendKeyEvent(new KeyEvent(action, code));
                     result.success(null);
                     break;
@@ -137,10 +144,10 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
                 }
             }
         } catch (RemoteException e) {
+            Log.e(TAG, "Remote exception during method call: " + call.method, e);
             result.error("SERVICE_ERROR", "A remote exception occurred: " + e.getMessage(), e.toString());
         }
     }
-
 
     /**
      * On listen.
@@ -151,11 +158,14 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
     @Override
     public void onListen(Object arguments, EventSink events) {
         scannerServiceReceiver = createScannerServiceReceiver(events);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(scannerServiceReceiver, new IntentFilter("com.sunmi.scanner.ACTION_DATA_CODE_RECEIVED"), Context.RECEIVER_EXPORTED);
-        } else {
-            context.registerReceiver(scannerServiceReceiver, new IntentFilter("com.sunmi.scanner.ACTION_DATA_CODE_RECEIVED"));
-        }
+
+        // Use ContextCompat to securely register the receiver and handle the RECEIVER_EXPORTED lint warning natively
+        ContextCompat.registerReceiver(
+                context,
+                scannerServiceReceiver,
+                new IntentFilter("com.sunmi.scanner.ACTION_DATA_CODE_RECEIVED"),
+                ContextCompat.RECEIVER_EXPORTED
+        );
     }
 
     /**
@@ -169,7 +179,7 @@ public class SunmiScannerPlugin implements FlutterPlugin, MethodCallHandler, Str
             try {
                 context.unregisterReceiver(scannerServiceReceiver);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Failed to unregister scanner service receiver", e);
             }
             scannerServiceReceiver = null;
         }
