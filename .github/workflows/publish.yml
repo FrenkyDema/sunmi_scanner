@@ -16,7 +16,7 @@ jobs:
       JAVA_VERSION: "11.0"
       FLUTTER_VERSION: "3.41.9"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
