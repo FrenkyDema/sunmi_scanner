@@ -1,4 +1,11 @@
-# Local configuration file (sdk path, etc)
-local.properties
+# Files excluded from the pub.dev package archive.
+# Note: a .pubignore replaces the root .gitignore for publishing, so the
+# relevant exclusions are repeated here.
+build/
+.gradle/
 .idea/
-android/.idea/
+.fvm/
+*.iml
+*.log
+local.properties
+coverage/
