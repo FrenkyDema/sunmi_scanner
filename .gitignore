@@ -243,7 +243,9 @@ fabric.properties
 
 !/gradle/wrapper/gradle-wrapper.jar
 
-# End of https://www.toptal.com/developers/gitignore/api/androidstudio,flutter,dart,android!/example/pubspec.lock
+# End of https://www.toptal.com/developers/gitignore/api/androidstudio,flutter,dart,android
+
+!/example/pubspec.lock
 example/linux/flutter/ephemeral/.plugin_symlinks/path_provider_linux
 example/linux/flutter/ephemeral/.plugin_symlinks/risto_widgets
 example/macos/Flutter/ephemeral/Flutter-Generated.xcconfig

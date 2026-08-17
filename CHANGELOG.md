@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.0.8
+
+* Migrates the Android implementation from Java to Kotlin, compiled with AGP's built-in Kotlin
+  support (no longer applies the Kotlin Gradle Plugin), for compatibility with AGP 9+.
+* Updates the minimum supported SDK version to Flutter 3.44/Dart 3.12.
+* Updates the example app to AGP 9.0.1, Gradle 9.1.0, and `android.builtInKotlin=true`.
+* Adds a Dart unit test suite for the method/event channels and runs Dart tests, the example APK
+  build, and the native Android unit tests in CI.
+
 ## 0.0.7
 
 * **BREAKING CHANGE:** You must now call `SunmiScanner.bindService()` before using any scanner
