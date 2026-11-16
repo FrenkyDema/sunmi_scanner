@@ -167,10 +167,14 @@ class SunmiScanner {
 
   /// Subscribe to this stream to receive barcode as string when it's scanned.
   /// Make sure to cancel subscription when you're done.
+  ///
+  /// Scan events without data are skipped. The data is passed as the scanner
+  /// sends it, with any suffix (for example a trailing newline) it adds.
   static Stream<String> onBarcodeScanned() {
-    _onBarcodeScanned ??= _eventChannel.receiveBroadcastStream().map(
-      (dynamic event) => event as String,
-    );
+    _onBarcodeScanned ??= _eventChannel
+        .receiveBroadcastStream()
+        .where((dynamic event) => event is String && event.isNotEmpty)
+        .cast<String>();
     return _onBarcodeScanned ?? const Stream<String>.empty();
   }
 
