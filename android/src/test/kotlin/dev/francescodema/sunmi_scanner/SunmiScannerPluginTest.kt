@@ -39,4 +39,60 @@ class SunmiScannerPluginTest {
 
         verify(mockResult).success(null)
     }
+    @Test
+    fun onMethodCall_getUsbDevicesWithoutEngine_returnsNotAttachedError() {
+        val plugin = SunmiScannerPlugin()
+
+        val call = MethodCall("GET_USB_DEVICES", null)
+        val mockResult = mock(MethodChannel.Result::class.java)
+        plugin.onMethodCall(call, mockResult)
+
+        verify(mockResult).error(
+            "NOT_ATTACHED",
+            "The plugin is not attached to a Flutter engine.",
+            null
+        )
+    }
+
+    @Test
+    fun onMethodCall_setUsbScannerOutputWithoutType_returnsInvalidArgument() {
+        val plugin = SunmiScannerPlugin()
+
+        val call = MethodCall(
+            "SET_USB_SCANNER_OUTPUT",
+            mapOf("name" to "SM-2D PRODUCT DEFHID+KBW", "pid" to 275, "vid" to 12879)
+        )
+        val mockResult = mock(MethodChannel.Result::class.java)
+        plugin.onMethodCall(call, mockResult)
+
+        verify(mockResult).error(
+            "INVALID_ARGUMENT",
+            "Arguments 'name', 'pid', 'vid' and 'type' must not be null.",
+            null
+        )
+    }
+
+    @Test
+    fun onMethodCall_setUsbScannerOutputWithoutEngine_returnsNotAttachedError() {
+        val plugin = SunmiScannerPlugin()
+
+        val call = MethodCall(
+            "SET_USB_SCANNER_OUTPUT",
+            mapOf(
+                "name" to "SM-2D PRODUCT DEFHID+KBW",
+                "pid" to 275,
+                "vid" to 12879,
+                "type" to 2,
+                "toast" to false
+            )
+        )
+        val mockResult = mock(MethodChannel.Result::class.java)
+        plugin.onMethodCall(call, mockResult)
+
+        verify(mockResult).error(
+            "NOT_ATTACHED",
+            "The plugin is not attached to a Flutter engine.",
+            null
+        )
+    }
 }

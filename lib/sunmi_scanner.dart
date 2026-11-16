@@ -53,6 +53,56 @@ enum ScannerConnectionStatus {
   failedToConnect,
 }
 
+/// A USB device attached to the terminal, as Android lists it.
+///
+/// Pass it to [SunmiScanner.setUsbScannerOutput] to choose how a USB
+/// barcode scanner delivers its data.
+class SunmiUsbDevice {
+  /// Creates a USB device description.
+  const SunmiUsbDevice({
+    required this.name,
+    required this.vendorId,
+    required this.productId,
+  });
+
+  /// The product name the device reports (empty when it reports none).
+  final String name;
+
+  /// The USB vendor id (VID).
+  final int vendorId;
+
+  /// The USB product id (PID).
+  final int productId;
+
+  @override
+  String toString() =>
+      'SunmiUsbDevice($name, vid: 0x${vendorId.toRadixString(16)}, '
+      'pid: 0x${productId.toRadixString(16)})';
+}
+
+/// How a USB barcode scanner delivers what it reads, as in the Sunmi
+/// "Barcode Scanner User Guide" (`com.sunmi.scanner.ACTION_BAR_DEVICES_SETTING`).
+enum SunmiScannerOutput {
+  /// The device is treated as a plain keyboard, not as a scanner.
+  keyboard(0),
+
+  /// Key events, typed into the focused input field.
+  keyEvent(1),
+
+  /// Broadcast only: [SunmiScanner.onBarcodeScanned] receives the data and
+  /// nothing is typed into input fields.
+  broadcast(2),
+
+  /// The whole code is filled into the focused input field at once
+  /// (Sunmi scanner service 1.0.18 or newer).
+  fillAtOnce(3);
+
+  const SunmiScannerOutput(this.code);
+
+  /// The `type` value the Sunmi scanner service expects.
+  final int code;
+}
+
 /// Plugin that wraps Sunmi Android SDK for integrated barcode scanner
 class SunmiScanner {
   static const MethodChannel _channel = MethodChannel('sunmi_scanner');
@@ -162,15 +212,59 @@ class SunmiScanner {
     }
   }
 
+  /// Lists the USB devices attached to the terminal.
+  ///
+  /// It does not need [bindService]. Use it to find the USB barcode scanner
+  /// to pass to [setUsbScannerOutput].
+  static Future<List<SunmiUsbDevice>> getUsbDevices() async {
+    final List<Object?>? devices = await _channel.invokeListMethod<Object?>(
+      'GET_USB_DEVICES',
+    );
+    return [
+      for (final Object? device in devices ?? const <Object?>[])
+        if (device is Map)
+          SunmiUsbDevice(
+            name: device['name'] as String? ?? '',
+            vendorId: device['vendorId'] as int,
+            productId: device['productId'] as int,
+          ),
+    ];
+  }
+
+  /// Sets how the USB barcode scanner [device] delivers what it reads.
+  ///
+  /// With [SunmiScannerOutput.broadcast], scans arrive only through
+  /// [onBarcodeScanned]. The Sunmi scanner service keeps the setting, so it
+  /// survives restarts. It does not need [bindService]. [showToast] makes the
+  /// service show a debugging toast.
+  static Future<void> setUsbScannerOutput(
+    SunmiUsbDevice device,
+    SunmiScannerOutput output, {
+    bool showToast = false,
+  }) async {
+    await _channel.invokeMethod('SET_USB_SCANNER_OUTPUT', {
+      'name': device.name,
+      'pid': device.productId,
+      'vid': device.vendorId,
+      'type': output.code,
+      'toast': showToast,
+    });
+  }
+
   /// Stream for the event value
   static Stream<String>? _onBarcodeScanned;
 
   /// Subscribe to this stream to receive barcode as string when it's scanned.
   /// Make sure to cancel subscription when you're done.
+  ///
+  /// Events without data are skipped. The data is passed as the scanner
+  /// sends it, with any suffix (for example a trailing newline) it is
+  /// configured to add.
   static Stream<String> onBarcodeScanned() {
-    _onBarcodeScanned ??= _eventChannel.receiveBroadcastStream().map(
-      (dynamic event) => event as String,
-    );
+    _onBarcodeScanned ??= _eventChannel
+        .receiveBroadcastStream()
+        .where((dynamic event) => event is String && event.isNotEmpty)
+        .cast<String>();
     return _onBarcodeScanned ?? const Stream<String>.empty();
   }
 

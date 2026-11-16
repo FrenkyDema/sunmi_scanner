@@ -132,20 +132,88 @@ void main() {
     });
   });
 
+  group('usb scanners', () {
+    test('getUsbDevices reads name, vendor and product ids', () async {
+      response = <Object?>[
+        <Object?, Object?>{
+          'name': 'SM-2D PRODUCT DEFHID+KBW',
+          'vendorId': 0x324F,
+          'productId': 0x0113,
+        },
+        <Object?, Object?>{'name': null, 'vendorId': 0x0424, 'productId': 1},
+      ];
+
+      final List<SunmiUsbDevice> devices = await SunmiScanner.getUsbDevices();
+
+      expect(log.single.method, 'GET_USB_DEVICES');
+      expect(devices, hasLength(2));
+      expect(devices.first.name, 'SM-2D PRODUCT DEFHID+KBW');
+      expect(devices.first.vendorId, 0x324F);
+      expect(devices.first.productId, 0x0113);
+      expect(devices.last.name, '');
+    });
+
+    test('getUsbDevices is empty when the platform returns nothing', () async {
+      response = null;
+
+      expect(await SunmiScanner.getUsbDevices(), isEmpty);
+    });
+
+    test(
+      'setUsbScannerOutput forwards the device and the output code',
+      () async {
+        const SunmiUsbDevice reader = SunmiUsbDevice(
+          name: 'SM-2D PRODUCT DEFHID+KBW',
+          vendorId: 0x324F,
+          productId: 0x0113,
+        );
+
+        await SunmiScanner.setUsbScannerOutput(
+          reader,
+          SunmiScannerOutput.broadcast,
+        );
+
+        expect(log.single.method, 'SET_USB_SCANNER_OUTPUT');
+        expect(log.single.arguments, {
+          'name': 'SM-2D PRODUCT DEFHID+KBW',
+          'pid': 0x0113,
+          'vid': 0x324F,
+          'type': 2,
+          'toast': false,
+        });
+      },
+    );
+
+    test('every output has the code of the Sunmi guide', () {
+      expect(SunmiScannerOutput.keyboard.code, 0);
+      expect(SunmiScannerOutput.keyEvent.code, 1);
+      expect(SunmiScannerOutput.broadcast.code, 2);
+      expect(SunmiScannerOutput.fillAtOnce.code, 3);
+    });
+  });
+
   group('event streams', () {
-    test('onBarcodeScanned emits scanned barcodes', () async {
+    // onBarcodeScanned() caches its stream, and a closed broadcast stream
+    // cannot be listened to again: every barcode case lives in this test.
+    test('onBarcodeScanned emits barcodes and skips empty events', () async {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockStreamHandler(
             const EventChannel('sunmi_scanner_events'),
             MockStreamHandler.inline(
               onListen: (Object? arguments, MockStreamHandlerEventSink events) {
                 events.success('4006381333931');
+                events.success(null);
+                events.success('');
+                events.success('U-527845\n');
                 events.endOfStream();
               },
             ),
           );
 
-      expect(await SunmiScanner.onBarcodeScanned().first, '4006381333931');
+      expect(await SunmiScanner.onBarcodeScanned().toList(), [
+        '4006381333931',
+        'U-527845\n',
+      ]);
     });
 
     test('onScannerStatusChanged maps native status strings', () async {

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.hardware.usb.UsbManager
 import android.os.RemoteException
 import android.util.Log
 import android.view.KeyEvent
@@ -72,6 +73,51 @@ class SunmiScannerPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         if (call.method == "unbindService") {
             sunmiScannerMethod?.disconnectScannerService()
             sunmiScannerMethod = null
+            result.success(null)
+            return
+        }
+
+        // The USB scanner methods talk to Android and to the Sunmi scanner
+        // service through broadcasts: they do not need bindService().
+        if (call.method == "GET_USB_DEVICES") {
+            val ctx = context ?: return notAttached(result)
+            val manager = ctx.getSystemService(Context.USB_SERVICE) as? UsbManager
+            val devices = manager?.deviceList?.values.orEmpty().map {
+                mapOf(
+                    "name" to it.productName,
+                    "vendorId" to it.vendorId,
+                    "productId" to it.productId,
+                )
+            }
+            result.success(devices)
+            return
+        }
+
+        if (call.method == "SET_USB_SCANNER_OUTPUT") {
+            val name = call.argument<String>("name")
+            val pid = call.argument<Int>("pid")
+            val vid = call.argument<Int>("vid")
+            val type = call.argument<Int>("type")
+            if (name == null || pid == null || vid == null || type == null) {
+                result.error(
+                    "INVALID_ARGUMENT",
+                    "Arguments 'name', 'pid', 'vid' and 'type' must not be null.",
+                    null
+                )
+                return
+            }
+            val ctx = context ?: return notAttached(result)
+            // Sunmi "Barcode Scanner User Guide": the scanner service keeps
+            // the output mode of each USB scanner (0 keyboard, 1 KeyEvent,
+            // 2 broadcast, 3 fill at once).
+            val intent = Intent(ACTION_BAR_DEVICES_SETTING)
+                .setPackage(SCANNER_SERVICE_PACKAGE)
+                .putExtra("name", name)
+                .putExtra("pid", pid)
+                .putExtra("vid", vid)
+                .putExtra("type", type)
+                .putExtra("toast", call.argument<Boolean>("toast") ?: false)
+            ctx.sendBroadcast(intent)
             result.success(null)
             return
         }
@@ -152,7 +198,8 @@ class SunmiScannerPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
     private fun createScannerServiceReceiver(events: EventSink?): BroadcastReceiver {
         return object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                events?.success(intent.getStringExtra("data"))
+                val data = intent.getStringExtra("data")
+                if (!data.isNullOrEmpty()) events?.success(data)
             }
         }
     }
@@ -170,7 +217,13 @@ class SunmiScannerPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
         connectionEventChannel = null
     }
 
+    private fun notAttached(result: MethodChannel.Result) {
+        result.error("NOT_ATTACHED", "The plugin is not attached to a Flutter engine.", null)
+    }
+
     private companion object {
         const val TAG = "SunmiScannerPlugin"
+        const val SCANNER_SERVICE_PACKAGE = "com.sunmi.scanner"
+        const val ACTION_BAR_DEVICES_SETTING = "com.sunmi.scanner.ACTION_BAR_DEVICES_SETTING"
     }
 }
