@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.0.9
+
+* Fix: `onBarcodeScanned()` skips scan events without data. Before, a scan broadcast without
+  `data` reached Dart as `null` and failed the stream with a cast error; the native receiver no
+  longer sends empty events either.
+
 ## 0.0.8
 
 * Migrates the Android implementation from Java to Kotlin, compiled with AGP's built-in Kotlin

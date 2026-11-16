@@ -10,7 +10,8 @@ A Flutter plugin that wraps the Sunmi Android SDK for the integrated barcode sca
 
 * **Manual Service Control:** Manually bind and unbind from the Sunmi scanner service.
 * **Optional Toasts:** Disable the native "Service connected/disconnected" toasts.
-* **Barcode Events:** Listen to a stream of barcode scan events.
+* **Barcode Events:** Listen to a stream of barcode scan events. Events without data are skipped;
+  the data keeps any suffix the scanner adds (for example a trailing newline).
 * **Connection Status:** Listen to a stream of service connection status changes (`connected`,
   `disconnected`, `failedToConnect`).
 * **Type-Safe Models:** Get the hardware scanner model as a `SunmiScannerModel` enum.
