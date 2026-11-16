@@ -152,7 +152,9 @@ class SunmiScannerPlugin : FlutterPlugin, MethodCallHandler, StreamHandler {
     private fun createScannerServiceReceiver(events: EventSink?): BroadcastReceiver {
         return object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                events?.success(intent.getStringExtra("data"))
+                // A scan broadcast without data would reach Dart as null.
+                val data = intent.getStringExtra("data")
+                if (!data.isNullOrEmpty()) events?.success(data)
             }
         }
     }

@@ -133,19 +133,27 @@ void main() {
   });
 
   group('event streams', () {
-    test('onBarcodeScanned emits scanned barcodes', () async {
+    // onBarcodeScanned() caches its stream, and a closed broadcast stream
+    // cannot be listened to again: every barcode case lives in this test.
+    test('onBarcodeScanned emits barcodes and skips empty events', () async {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockStreamHandler(
             const EventChannel('sunmi_scanner_events'),
             MockStreamHandler.inline(
               onListen: (Object? arguments, MockStreamHandlerEventSink events) {
                 events.success('4006381333931');
+                events.success(null);
+                events.success('');
+                events.success('U-527845\n');
                 events.endOfStream();
               },
             ),
           );
 
-      expect(await SunmiScanner.onBarcodeScanned().first, '4006381333931');
+      expect(await SunmiScanner.onBarcodeScanned().toList(), [
+        '4006381333931',
+        'U-527845\n',
+      ]);
     });
 
     test('onScannerStatusChanged maps native status strings', () async {
