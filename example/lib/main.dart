@@ -14,10 +14,18 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String? scannedValue;
+  List<SunmiUsbDevice> usbDevices = const [];
 
   void _setScannedValue(String value) {
     setState(() {
       scannedValue = value;
+    });
+  }
+
+  Future<void> _loadUsbDevices() async {
+    final devices = await SunmiScanner.getUsbDevices();
+    setState(() {
+      usbDevices = devices;
     });
   }
 
@@ -44,6 +52,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     SunmiScanner.bindService();
+    _loadUsbDevices();
   }
 
   @override
@@ -51,11 +60,37 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('Plugin example app')),
-        body: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [Center(child: Text("scanning: ${scannedValue ?? ""}"))],
-          ),
+        body: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Center(child: Text("scanning: ${scannedValue ?? ""}")),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                const Expanded(child: Text('USB devices')),
+                TextButton(
+                  onPressed: _loadUsbDevices,
+                  child: const Text('Refresh'),
+                ),
+              ],
+            ),
+            for (final device in usbDevices)
+              ListTile(
+                title: Text(device.name.isEmpty ? '(no name)' : device.name),
+                subtitle: Text(
+                  'VID 0x${device.vendorId.toRadixString(16)} · '
+                  'PID 0x${device.productId.toRadixString(16)}',
+                ),
+                trailing: TextButton(
+                  onPressed: () => SunmiScanner.setUsbScannerOutput(
+                    device,
+                    SunmiScannerOutput.broadcast,
+                    showToast: true,
+                  ),
+                  child: const Text('Broadcast output'),
+                ),
+              ),
+          ],
         ),
       ),
     );

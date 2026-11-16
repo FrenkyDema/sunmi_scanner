@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 0.0.9
+
+* Adds `SunmiScanner.getUsbDevices()`, which lists the USB devices attached to the terminal
+  (`SunmiUsbDevice`: name, vendor id, product id).
+* Adds `SunmiScanner.setUsbScannerOutput()` with `SunmiScannerOutput`, which sets how a USB barcode
+  scanner delivers its data (keyboard, KeyEvent, broadcast, fill at once) through the Sunmi
+  `com.sunmi.scanner.ACTION_BAR_DEVICES_SETTING` broadcast. With `SunmiScannerOutput.broadcast`
+  the scans reach `onBarcodeScanned()` without typing into input fields. Neither method needs
+  `bindService()`.
+* `onBarcodeScanned()` skips scan events without data instead of failing the stream with a cast
+  error.
+* Tested on the SUNMI FLEX 3 with its USB 2D scanner (`SM-2D PRODUCT DEFHID+KBW`).
+
 ## 0.0.8
 
 * Migrates the Android implementation from Java to Kotlin, compiled with AGP's built-in Kotlin

@@ -17,6 +17,8 @@ A Flutter plugin that wraps the Sunmi Android SDK for the integrated barcode sca
 * **Error Handling:** Methods throw a `PlatformException` if the service is not bound or another
   error occurs.
 * **Scanner Control:** Programmatically start (`scan()`) and stop (`stop()`) the scanner.
+* **USB Scanners:** List the attached USB devices (`getUsbDevices()`) and set how a USB barcode
+  scanner delivers its data (`setUsbScannerOutput()`), for example broadcast only.
 
 ## Installation
 
@@ -37,6 +39,28 @@ connection.
 ### 2. Listen to Streams and Call Methods
 
 Once bound, you can listen to streams and call methods like `scan()`.
+
+### 3. USB Barcode Scanners
+
+Terminals with a USB scanner (for example the SUNMI FLEX 3) deliver the scans as key events by
+default, so `onBarcodeScanned()` receives nothing. Switch the scanner to broadcast output once; the
+Sunmi scanner service keeps the setting:
+
+```dart
+final devices = await SunmiScanner.getUsbDevices();
+for (final device in devices) {
+  // The scanner of the SUNMI FLEX 3: "SM-2D PRODUCT DEFHID+KBW", VID 0x324F.
+  if (device.name.contains('SM-2D')) {
+    await SunmiScanner.setUsbScannerOutput(device, SunmiScannerOutput.broadcast);
+  }
+}
+```
+
+The scanned data arrives with the suffix the scanner adds (often a trailing newline): trim it if
+you need the bare code. These two methods do not need `bindService()`.
+
+On the SUNMI FLEX 3 the base peripherals (scanner, printer, USB Ethernet) are detached while a
+USB cable connects the terminal to a computer: use `adb` over Wi-Fi to debug the scanner.
 
 ### Full Example
 
@@ -160,4 +184,5 @@ class _MyAppState extends State<MyApp> {
 Sunmi L2ks
 SunMi P3H
 SUNMI L2s PRO
+SUNMI FLEX 3 (USB scanner)
 ```
